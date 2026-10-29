@@ -1312,10 +1312,11 @@
 
     <!-- FAB 3: WhatsApp Quick Chat -->
     <a 
-      href="https://wa.me/919429311498?text=Hello%20Rahul%20Industries%2C%20I%20would%20like%20to%20enquire%20about%20your%20services." 
+      href="https://api.whatsapp.com/send?phone=919429311498&text=Hello%20Rahul%20Industries%2C%20I%20would%20like%20to%20enquire%20about%20your%20services." 
       target="_blank" 
       rel="noopener noreferrer" 
-      class="w-12 h-12 rounded-full bg-[#25D366] text-white shadow-lg flex items-center justify-center hover:bg-[#20ba5a] hover:shadow-xl whatsapp-pulse transition-all duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-[#25D366] flex-shrink-0 aspect-square"
+      data-base-msg="Hello Rahul Industries, I would like to enquire about your services."
+      class="set-url-target w-12 h-12 rounded-full bg-[#25D366] text-white shadow-lg flex items-center justify-center hover:bg-[#20ba5a] hover:shadow-xl whatsapp-pulse transition-all duration-200 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-[#25D366] flex-shrink-0 aspect-square"
       aria-label="Chat with Rahul Industries on WhatsApp"
       title="WhatsApp Chat"
     >
@@ -1394,6 +1395,36 @@
           setTimeout(dismissPreloader, 100);
         }, { once: true });
       }
+    })();
+
+    // Dynamic WhatsApp Target Link Updater with Debounced Resize & Device Detection
+    (function initDynamicWhatsApp() {
+      let debounceTimer = null;
+
+      function updateWhatsAppTargets() {
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 768);
+        const baseUrl = isMobile ? "https://api.whatsapp.com/send" : "https://web.whatsapp.com/send";
+        const phoneNumber = "919429311498";
+
+        document.querySelectorAll(".set-url-target").forEach((el) => {
+          const msg = el.getAttribute("data-base-msg");
+          const queryParams = msg 
+            ? `?phone=${phoneNumber}&text=${encodeURIComponent(msg)}` 
+            : `?phone=${phoneNumber}`;
+          el.setAttribute("href", `${baseUrl}${queryParams}`);
+        });
+      }
+
+      function debouncedUpdate() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(updateWhatsAppTargets, 150);
+      }
+
+      // Initial execution and event listeners
+      updateWhatsAppTargets();
+      window.addEventListener("resize", debouncedUpdate, { passive: true });
+      window.addEventListener("load", updateWhatsAppTargets, { once: true });
+      document.addEventListener("DOMContentLoaded", updateWhatsAppTargets);
     })();
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -1542,7 +1573,10 @@
                      `*Details:* ${message}\n\n` +
                      `_Sent via Rahul Industries Official Portal_`;
 
-        const whatsappUrl = `https://wa.me/919429311498?text=${encodeURIComponent(text)}`;
+        // Dynamic WhatsApp URL generator for mobile/desktop
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const baseUrl = isMobile ? "https://api.whatsapp.com/send" : "https://web.whatsapp.com/send";
+        const whatsappUrl = `${baseUrl}?phone=919429311498&text=${encodeURIComponent(text)}`;
 
         // Show feedback banner
         formFeedback.className = 'p-3.5 rounded-lg text-xs sm:text-sm bg-emerald-50 text-emerald-800 border border-emerald-300 block';
